@@ -1,6 +1,6 @@
 import pyodbc
 
-def selectSQL(sql):
+def selectSQL(sql,params=()):
     conn = pyodbc.connect(
         'DRIVER={SQL Server};'
         'SERVER=127.0.0.1;'
@@ -9,9 +9,32 @@ def selectSQL(sql):
         'PWD=123456'
     )
     cursor = conn.cursor()
-    cursor.execute(sql)
+    cursor.execute(sql,params)
     rows = cursor.fetchall()
     cols = [col[0] for col in cursor.description]
     cursor.close()
     conn.close()
     return rows,cols
+
+
+def insertSQL(sql,params=()):
+    conn = pyodbc.connect(
+        'DRIVER={SQL Server};'
+        'SERVER=127.0.0.1;'
+        'DATABASE=MyTEST;'
+        'UID=sa;'
+        'PWD=123456'
+    )
+    cursor = conn.cursor()
+    successFlag = True
+    try:
+        cursor.execute(sql,params)
+        cursor.commit()
+    except pyodbc.Error as e:
+        print(e)
+        successFlag = False
+        conn.rollback()
+    finally:
+        cursor.close()
+        conn.close()
+    return successFlag

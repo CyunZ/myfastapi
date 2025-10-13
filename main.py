@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from api.TestAPIs import TestRouter
 from starlette.middleware.sessions import SessionMiddleware
 from api.HIS.ClinicAPIs import ClinicRouter
+from api.UserAPIs import UserRouter
 
 app = FastAPI()
 
@@ -26,6 +27,8 @@ app.add_middleware(
 
 app.include_router(TestRouter)
 app.include_router(ClinicRouter)
+app.include_router(UserRouter)
+
 
 
 
