@@ -30,17 +30,7 @@ async def testSQL():
     data = [dict(zip(cols,row)) for row in rows ]
     return {'code':0,'data':data}
 
-class LoginInfo(BaseModel):
-    uname:str
-    pwd:str
 
-@TestRouter.post('/login')
-async def login(request:Request, loInfo : LoginInfo):
-    if loInfo.uname == 'abc' and loInfo.pwd == '123':
-        request.session['userid'] = 888
-        return {'code':0,'msg':'登录成功','nickname':'获取的昵称'}
-    else:
-        return {'code':1,'msg':'用户名或密码错误'}
     
 @TestRouter.get('/getUserInfo')
 async def getUserInfo(request:Request):

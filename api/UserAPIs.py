@@ -37,3 +37,26 @@ async def signup(request:Request, signupInfo : SignUpInfo):
     else:
         return  {'code':1,'msg':'注册失败，请联系管理员'}
 
+class LoginInfo(BaseModel):
+    uname:str =''
+    pwd:str = ''
+
+@UserRouter.post('/login')
+async def login(request:Request, loInfo : LoginInfo):
+    if loInfo.uname == '':
+        return {'code':1,'msg':'用户名不能为空'}
+    if loInfo.pwd == '':
+        return {'code':1,'msg':'密码不能为空'}
+    
+
+    rows,cols = DBTool.selectSQL(UserSQLs.selectLoginUserSQL,(loInfo.uname))
+    if len(rows) == 0:
+        return {'code':1,'msg':'用户名或密码错误'}
+    row = rows[0]
+
+    flag = bcrypt.checkpw(loInfo.pwd.encode('utf-8'),row[1])
+    if flag:
+        request.session['userid'] = row[0]
+        return {'code':0,'msg':'登录成功','nickname':row[2]}
+
+    return {'code':1,'msg':'用户名或密码错误'}
