@@ -26,15 +26,12 @@ def insertSQL(sql,params=()):
         'PWD=123456'
     )
     cursor = conn.cursor()
-    successFlag = True
     try:
         cursor.execute(sql,params)
         cursor.commit()
     except pyodbc.Error as e:
-        print(e)
-        successFlag = False
         conn.rollback()
+        raise
     finally:
         cursor.close()
         conn.close()
-    return successFlag

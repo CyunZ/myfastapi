@@ -5,6 +5,11 @@ from api.TestAPIs import TestRouter
 from starlette.middleware.sessions import SessionMiddleware
 from api.HIS.ClinicAPIs import ClinicRouter
 from api.UserAPIs import UserRouter
+from loguru import logger
+import sys
+logger.remove()
+logger.add('mylogs/mylog{time:YYYY-MM-DD}.log',rotation='00:00')
+logger.add(sys.stderr)
 
 app = FastAPI()
 
@@ -34,6 +39,7 @@ app.include_router(UserRouter)
 
 @app.get('/')
 async def root():
+    logger.info('测试')
     return '你好'
 
 

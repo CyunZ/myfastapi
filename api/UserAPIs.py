@@ -4,7 +4,7 @@ import pyodbc
 import DBTool
 import bcrypt
 import api.UserSQLs as UserSQLs
-
+from loguru import logger
 UserRouter = APIRouter(prefix='/user',tags=['用户'])
 
 
@@ -23,19 +23,20 @@ async def signup(request:Request, signupInfo : SignUpInfo):
         return {'code':1,'msg':'密码不能为空'}
     if signupInfo.nickname == '':
         return {'code':1,'msg':'昵称不能为空'}
-
     rows,cols = DBTool.selectSQL(UserSQLs.selectUserByUsernameSQL,(signupInfo.username))
     if len(rows) > 0:
         return {'code':1,'msg':'该用户已注册'}
     
     hashPwd = bcrypt.hashpw(signupInfo.pwd.encode('utf-8'),bcrypt.gensalt())
 
-    successFlag = DBTool.insertSQL(UserSQLs.insertUserSQL,(signupInfo.username,hashPwd,signupInfo.nickname))
-
-    if successFlag:
-        return  {'code':0,'msg':'注册成功'}
-    else:
+    try:
+        DBTool.insertSQL(UserSQLs.insertUserSQL,(signupInfo.username,hashPwd,signupInfo.nickname))
+    except pyodbc.Error as e :
+        logger.error(e)
         return  {'code':1,'msg':'注册失败，请联系管理员'}
+
+    return  {'code':0,'msg':'注册成功'}
+        
 
 class LoginInfo(BaseModel):
     uname:str =''
@@ -57,6 +58,7 @@ async def login(request:Request, loInfo : LoginInfo):
     flag = bcrypt.checkpw(loInfo.pwd.encode('utf-8'),row[1])
     if flag:
         request.session['userid'] = row[0]
+        logger.info('登录成功，用户ID:'+ str( row[0]) + ',用户名:'+ loInfo.uname )
         return {'code':0,'msg':'登录成功','nickname':row[2]}
 
     return {'code':1,'msg':'用户名或密码错误'}
