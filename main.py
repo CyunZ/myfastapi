@@ -7,11 +7,24 @@ from api.HIS.ClinicAPIs import ClinicRouter
 from api.UserAPIs import UserRouter
 from loguru import logger
 import sys
-logger.remove()
-logger.add('mylogs/mylog{time:YYYY-MM-DD}.log',rotation='00:00')
-logger.add(sys.stderr)
+from api.AIChatAPIs import AIChatRouter,loadAIModel
+from contextlib import asynccontextmanager
 
-app = FastAPI()
+
+
+
+@asynccontextmanager
+async def lifespan(app:FastAPI):
+    logger.remove()
+    logger.add('mylogs/mylog{time:YYYY-MM-DD}.log',rotation='00:00')
+    logger.add(sys.stderr)
+    loadAIModel()
+
+    yield
+    logger.info('项目关闭')
+
+
+app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -33,6 +46,7 @@ app.add_middleware(
 app.include_router(TestRouter)
 app.include_router(ClinicRouter)
 app.include_router(UserRouter)
+app.include_router(AIChatRouter)
 
 
 
