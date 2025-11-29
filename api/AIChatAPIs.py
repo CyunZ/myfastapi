@@ -4,7 +4,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from loguru import logger
 import DBTool
 import pyodbc
-import AIChatSQLs
+import api.AIChatSQLs as AIChatSQLs
 
 AIChatRouter = APIRouter(prefix='/aichat',tags=['聊天机器人'])
 
