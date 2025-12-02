@@ -7,9 +7,9 @@ from api.HIS.ClinicAPIs import ClinicRouter
 from api.UserAPIs import UserRouter
 from loguru import logger
 import sys
-from api.AIChatAPIs import AIChatRouter,loadAIModel
+# from api.AIChatAPIs import AIChatRouter,loadAIModel
 from contextlib import asynccontextmanager
-
+from middlewares.LoginMiddleware import LoginMiddleware
 
 
 
@@ -18,22 +18,13 @@ async def lifespan(app:FastAPI):
     logger.remove()
     logger.add('mylogs/mylog{time:YYYY-MM-DD}.log',rotation='00:00')
     logger.add(sys.stderr)
-    loadAIModel()
+    # loadAIModel()
 
     yield
     logger.info('项目关闭')
 
 
 app = FastAPI(lifespan=lifespan)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=['http://localhost:5173'],
-    allow_methods=['*'],
-    allow_headers=['*'],
-    allow_credentials=True,
-)
-
 app.add_middleware(
     SessionMiddleware,
     secret_key='jio3424fdsfoijo',
@@ -42,11 +33,22 @@ app.add_middleware(
     same_site = "none",
     https_only = True,
 )
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['http://localhost:5173'],
+    allow_methods=['*'],
+    allow_headers=['*'],
+    allow_credentials=True,
+)
+app.add_middleware(LoginMiddleware)
+
+
+
 
 app.include_router(TestRouter)
 app.include_router(ClinicRouter)
 app.include_router(UserRouter)
-app.include_router(AIChatRouter)
+# app.include_router(AIChatRouter)
 
 
 
