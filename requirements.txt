@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+pyodbc
+itsdangerous
+bcrypt
+loguru
+transformers
+# pytorch 需要自己到官网下载
