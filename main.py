@@ -25,6 +25,7 @@ async def lifespan(app:FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+app.add_middleware(LoginMiddleware)
 app.add_middleware(
     SessionMiddleware,
     secret_key='jio3424fdsfoijo',
@@ -40,7 +41,7 @@ app.add_middleware(
     allow_headers=['*'],
     allow_credentials=True,
 )
-app.add_middleware(LoginMiddleware)
+
 
 
 
