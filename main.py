@@ -10,7 +10,7 @@ import sys
 # from api.AIChatAPIs import AIChatRouter,loadAIModel
 from contextlib import asynccontextmanager
 from middlewares.LoginMiddleware import LoginMiddleware
-
+from pydantic import BaseModel
 
 
 @asynccontextmanager
@@ -25,7 +25,7 @@ async def lifespan(app:FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
-app.add_middleware(LoginMiddleware)
+# app.add_middleware(LoginMiddleware)
 app.add_middleware(
     SessionMiddleware,
     secret_key='jio3424fdsfoijo',
@@ -64,5 +64,23 @@ async def root():
 async def test():
     return '测试'
 
+
+@app.get('/music')
+async def music():
+    return 'I am the storm that is approaching!'
+
+
+
+class Something(BaseModel):
+    what : str = ''
+
+@app.post('/giveme')
+async def giveme(some : Something):
+    print('对方想要：'+ some.what)
+    if some.what == 'Yamato':
+        return 'If you want it,then you\'ll have to take it.'
+    else :
+        return 'OK'
+
 if __name__ == '__main__':
-    uvicorn.run('main:app',host='127.0.0.1',port=12345,reload=True)
+    uvicorn.run('main:app',host='192.168.31.216',port=12345,reload=True)
